@@ -57,6 +57,7 @@ class Black inherits Linea{
 
 class Platinum inherits Linea{
 	method consumoTipo(unC){
+		consumos.add(unC)
 	}
 }
 
@@ -101,13 +102,15 @@ class ConsumoLlamadas inherits Consumo{
 class Pack{
 	const fechaVen
 	
-	method puedeSatisfacer(unC) // = not vencido
+	method puedeSatisfacer(unC) = not self.pasado() && self.condParticular(unC)
 	
 	method pasado() = self.vencido() || self.agotado()
 	
 	method vencido() = fechaVen < new Date()
 	
 	method agotado()
+	
+	method condParticular(unC)
 }
 
 class PackConsumos inherits Pack{
@@ -127,27 +130,27 @@ class PackConsumos inherits Pack{
 
 class CreditoDisp inherits PackConsumos{
 	
-	override method puedeSatisfacer(unC) = super(unC) && unC.costo() <= cantidad
+	override method condParticular(unC) = unC.costo() <= cantidad
 }
 
 class MBlibres inherits PackConsumos{
 	
-	override method puedeSatisfacer(unC) = super(unC) && unC.mbs() <= cantidad && unC.esInternet()
+	override method condParticular(unC) = unC.mbs() <= cantidad && unC.esInternet()
 }
 
 class MBlibresPlus inherits MBlibres{
-	override method puedeSatisfacer(unC) = super(unC) && unC.mbs() <= 0.1
+	override method condParticular(unC) = unC.mbs() <= 0.1
 }
 
 class Llamadas inherits Pack{
 	const segundos
 	
-	override method puedeSatisfacer(unC) = super(unC) && unC.segundos() <= segundos && unC.esLlamada()
+	override method condParticular(unC) = unC.segundos() <= segundos && unC.esLlamada()
 }
 
 class InternetIlimitado inherits Pack{
 	
-	override method puedeSatisfacer(unC) =	super(unC) && unC.fecha().internalDayOfWeek() > 5 && unC.esInternet()
+	override method condParticular(unC) = unC.fecha().internalDayOfWeek() > 5 && unC.esInternet()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
